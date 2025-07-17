@@ -7,12 +7,16 @@ const app = express();
 const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
-    origin: '*',
-    methods: ['GET', 'POST']
+    origin: 'http://localhost:3000', // Erlaube nur das React-Frontend
+    methods: ['GET', 'POST'],
+    credentials: true
   }
 });
 
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',
+  credentials: true
+}));
 app.use(express.json());
 
 // Beispiel-Route
@@ -37,11 +41,14 @@ function logEvent(event) {
 }
 
 function assignRoles() {
+  // Spieler zufällig mischen
+  const shuffledPlayers = [...players].sort(() => Math.random() - 0.5);
   // Rollen mischen und zufällig zuweisen
   const shuffledRoles = [...gameStatus.roles].sort(() => Math.random() - 0.5);
-  players.forEach((p, i) => {
+  shuffledPlayers.forEach((p, i) => {
     p.role = shuffledRoles[i] || 'Dorfbewohner';
     p.alive = true;
+    p.mayor = false; // Bürgermeister-Status zurücksetzen
     // Rollenspezifische Attribute zurücksetzen
     p.isLover = false;
     p.healPotion = true;
@@ -96,6 +103,7 @@ io.on('connection', (socket) => {
       name,
       role: null,
       alive: true,
+      mayor: false,
       // weitere rollenspezifische Attribute folgen später
     };
     players.push(player);
@@ -216,11 +224,76 @@ io.on('connection', (socket) => {
     }
   });
 
-  // Trank einsetzen
+  // Spieler aus der Lobby entfernen
+  socket.on('removePlayer', (name, callback) => {
+    const idx = players.findIndex(p => p.name === name);
+    if (idx !== -1 && gameStatus.phase === 'lobby') {
+      players.splice(idx, 1);
+      broadcastLobby();
+      if (callback) callback({ success: true });
+    } else {
+      if (callback) callback({ success: false });
+    }
+  });
 
-  // Hier ggf. weitere Events einfügen
+  // Bürgermeister setzen/entfernen
+  socket.on('setMayor', (name, callback) => {
+    if (gameStatus.phase !== 'lobby' && gameStatus.phase !== 'night' && gameStatus.phase !== 'day') {
+      if (callback) callback({ success: false });
+      return;
+    }
+    players.forEach(p => p.mayor = false);
+    const mayor = players.find(p => p.name === name);
+    if (mayor) mayor.mayor = true;
+    broadcastLobby();
+    if (callback) callback({ success: true });
+  });
 
-}); // Ende io.on('connection', ...)
+  // Spielerstatus lebendig/tot umschalten (Moderator)
+  socket.on('toggleAlive', (name, callback) => {
+    const player = players.find(p => p.name === name);
+    if (player && gameStatus.phase !== 'lobby') {
+      player.alive = !player.alive;
+      broadcastLobby();
+      if (callback) callback({ success: true });
+    } else {
+      if (callback) callback({ success: false });
+    }
+  });
+
+  // Tag/Nacht-Wechsel (Moderator)
+  socket.on('moderatorSwitchPhase', () => {
+    if (!gameStatus.started) return;
+    if (gameStatus.phase === 'night') {
+      gameStatus.phase = 'day';
+      logEvent({ type: 'phase', message: 'Tagphase beginnt (Moderator).' });
+    } else if (gameStatus.phase === 'day') {
+      gameStatus.phase = 'night';
+      logEvent({ type: 'phase', message: 'Nachtphase beginnt (Moderator).' });
+    }
+    io.emit('phaseChange', gameStatus.phase);
+    broadcastLobby();
+  });
+
+  // Spiel beenden/neu starten (Moderator)
+  socket.on('endGame', (callback) => {
+    gameStatus = {
+      started: false,
+      phase: 'lobby',
+      round: 0,
+      roles: [],
+    };
+    players.forEach(p => {
+      p.role = null;
+      p.alive = true;
+      p.mayor = false;
+    });
+    eventLog = [];
+    broadcastLobby();
+    io.emit('gameEnded', null);
+    if (callback) callback({ success: true });
+  });
+}); // <--- Ende io.on('connection', ...)
 
 // Server starten
 const PORT = process.env.PORT || 3001;
