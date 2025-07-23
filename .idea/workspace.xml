@@ -4,9 +4,8 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="b66177b3-ef75-4445-8b3f-99896d9d350d" name="Changes" comment="Implement game lobby with moderator and player views">
+    <list default="true" id="b66177b3-ef75-4445-8b3f-99896d9d350d" name="Changes" comment="Add rules display toggle to moderator view and make callback optional in game start">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/backend/index.js" beforeDir="false" afterPath="$PROJECT_DIR$/backend/index.js" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -15,6 +14,7 @@
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/frontend" />
+    <option name="ROOT_SYNC" value="DONT_SYNC" />
   </component>
   <component name="GitHubPullRequestSearchHistory">{
   &quot;lastFilter&quot;: {
@@ -68,7 +68,7 @@
       <workItem from="1752699321216" duration="4372000" />
       <workItem from="1752778317822" duration="5818000" />
       <workItem from="1752920211310" duration="18000" />
-      <workItem from="1753267607505" duration="607000" />
+      <workItem from="1753267607505" duration="2079000" />
     </task>
     <task id="LOCAL-00001" summary="Implement game lobby with moderator and player views">
       <option name="closed" value="true" />
@@ -78,7 +78,15 @@
       <option name="project" value="LOCAL" />
       <updated>1752784198654</updated>
     </task>
-    <option name="localTasksCounter" value="2" />
+    <task id="LOCAL-00002" summary="Add rules display toggle to moderator view and make callback optional in game start">
+      <option name="closed" value="true" />
+      <created>1753268377852</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1753268377852</updated>
+    </task>
+    <option name="localTasksCounter" value="3" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
@@ -86,6 +94,7 @@
   </component>
   <component name="VcsManagerConfiguration">
     <MESSAGE value="Implement game lobby with moderator and player views" />
-    <option name="LAST_COMMIT_MESSAGE" value="Implement game lobby with moderator and player views" />
+    <MESSAGE value="Add rules display toggle to moderator view and make callback optional in game start" />
+    <option name="LAST_COMMIT_MESSAGE" value="Add rules display toggle to moderator view and make callback optional in game start" />
   </component>
 </project>

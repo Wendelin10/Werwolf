@@ -2,6 +2,7 @@ const express = require('express');
 const http = require('http');
 const { Server } = require('socket.io');
 const cors = require('cors');
+const path = require('path');
 
 const app = express();
 const server = http.createServer(app);
@@ -18,10 +19,15 @@ app.use(cors({
   credentials: true
 }));
 app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
 
 // Beispiel-Route
 app.get('/', (req, res) => {
   res.send('Werwölfe Backend läuft!');
+});
+
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
 // --- In-Memory-Datenmodelle ---
