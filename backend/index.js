@@ -118,6 +118,8 @@ io.on('connection', (socket) => {
 
   // Spiel starten (nur wenn genug Spieler)
   socket.on('startGame', (roles, callback) => {
+    // Callback optional machen, damit kein Fehler entsteht, falls keiner übergeben wird
+    if (typeof callback !== 'function') callback = () => {};
     if (gameStatus.started) {
       callback({ success: false, message: 'Spiel läuft bereits.' });
       return;
